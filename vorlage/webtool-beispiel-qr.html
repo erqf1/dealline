@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="de" data-acryl="slate" data-acryl-auto>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07080c">
+<meta name="description" content="QR-Codes gestalten – Farben, Verläufe, Punkt-Stile, Logo, Rahmen – für Links, WLAN, Kontakte, Bilder und mehr. Dazu ein Scanner.">
+<title>QR-Codes – mert.win</title>
+<link rel="icon" href="/app-icons/qr-192.png">
+<link rel="manifest" href="/qr/app.webmanifest">
+<link rel="apple-touch-icon" href="/app-icons/qr-192.png">
+<link rel="stylesheet" href="qr.css">
+<!-- Gestalten: qr-code-styling, Lesen: BarcodeDetector oder jsQR (beide von jsDelivr). Bilder hinter QR-Codes liegen bei Shareline (/share/api). -->
+<link rel="stylesheet" href="/app-icons/acryl.css">
+<link rel="stylesheet" href="/app-icons/mobile.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/qr/"><span class="logo"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM18 14h2M14 18v2"/></svg></span><span>QR-Codes</span></a>
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="make" aria-selected="true">Erstellen</button>
+    <button type="button" role="tab" data-tab="scan" aria-selected="false">Scannen</button>
+  </nav>
+  <span class="spacer"></span>
+  <a class="all" href="/help/" title="Alle Apps von mert.win"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg></a>
+</header>
+
+<!-- ================================================================ Erstellen -->
+<main class="make" id="make">
+  <div class="editor">
+    <section class="box">
+      <h2>Inhalt</h2>
+      <div class="types" id="types"></div>
+      <div class="fields" id="fields"></div>
+    </section>
+
+    <details class="box" open>
+      <summary><h2>Vorlagen</h2></summary>
+      <div class="presets" id="presets"></div>
+    </details>
+
+    <details class="box" open>
+      <summary><h2>Punkte</h2></summary>
+      <div class="styles" id="dot-styles"></div>
+      <div class="seg two" id="dot-fill">
+        <button type="button" data-v="solid">Eine Farbe</button>
+        <button type="button" data-v="grad">Verlauf</button>
+      </div>
+      <div class="colors">
+        <label class="color"><input type="color" data-s="color"><span>Farbe</span><code></code></label>
+        <label class="color grad-only"><input type="color" data-s="color2"><span>zweite Farbe</span><code></code></label>
+      </div>
+      <div class="grad-only row-fields">
+        <div class="seg two" id="grad-type">
+          <button type="button" data-v="linear">Linear</button>
+          <button type="button" data-v="radial">Kreisförmig</button>
+        </div>
+        <label class="range"><span>Winkel <b data-out="angle"></b></span><input type="range" data-s="angle" min="0" max="360" step="5"></label>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary><h2>Ecken</h2></summary>
+      <span class="lab">Äußere Ecken</span>
+      <div class="chips" id="cs-styles"></div>
+      <span class="lab">Innere Ecken</span>
+      <div class="chips" id="cd-styles"></div>
+      <label class="check"><input type="checkbox" data-s="cornersLinked"><span>Gleiche Farbe wie die Punkte</span></label>
+      <div class="colors" id="corner-colors">
+        <label class="color"><input type="color" data-s="csColor"><span>außen</span><code></code></label>
+        <label class="color"><input type="color" data-s="cdColor"><span>innen</span><code></code></label>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary><h2>Hintergrund &amp; Form</h2></summary>
+      <div class="colors">
+        <label class="color"><input type="color" data-s="bg"><span>Hintergrund</span><code></code></label>
+        <label class="check"><input type="checkbox" data-s="bgTransparent"><span>Durchsichtig</span></label>
+      </div>
+      <label class="range"><span>Ecken abrunden <b data-out="bgRound"></b></span><input type="range" data-s="bgRound" min="0" max="1" step="0.05"></label>
+      <span class="lab">Form</span>
+      <div class="seg two" id="shape">
+        <button type="button" data-v="square">Quadrat</button>
+        <button type="button" data-v="circle">Kreis</button>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary><h2>Logo in der Mitte</h2></summary>
+      <div class="logos" id="logos"></div>
+      <input type="file" id="logo-file" accept="image/*" hidden>
+      <div class="logo-opts" id="logo-opts">
+        <label class="color glyph-only"><input type="color" data-s="logoColor"><span>Kreis-Farbe</span><code></code></label>
+        <label class="range"><span>Größe <b data-out="logoSize"></b></span><input type="range" data-s="logoSize" min="0.15" max="0.5" step="0.01"></label>
+        <label class="range"><span>Abstand <b data-out="logoMargin"></b></span><input type="range" data-s="logoMargin" min="0" max="16" step="1"></label>
+        <label class="check"><input type="checkbox" data-s="logoHide"><span>Punkte unter dem Logo weglassen</span></label>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary><h2>Rahmen &amp; Text</h2></summary>
+      <div class="chips" id="frames"></div>
+      <div class="frame-opts" id="frame-opts">
+        <label class="field"><span>Text</span><input type="text" data-s="frameText" maxlength="40" placeholder="SCAN MICH"></label>
+        <label class="color"><input type="color" data-s="frameColor"><span>Rahmenfarbe</span><code></code></label>
+      </div>
+    </details>
+
+    <details class="box">
+      <summary><h2>Erweitert</h2></summary>
+      <span class="lab">Fehlerkorrektur <small>– je höher, desto mehr darf verdeckt oder dreckig sein (und desto dichter der Code)</small></span>
+      <div class="seg five" id="ecc">
+        <button type="button" data-v="auto">Auto</button>
+        <button type="button" data-v="L">L 7 %</button>
+        <button type="button" data-v="M">M 15 %</button>
+        <button type="button" data-v="Q">Q 25 %</button>
+        <button type="button" data-v="H">H 30 %</button>
+      </div>
+      <label class="range"><span>Rand <b data-out="margin"></b></span><input type="range" data-s="margin" min="0" max="50" step="1"></label>
+      <button class="btn small" type="button" id="reset">Aussehen zurücksetzen</button>
+    </details>
+  </div>
+
+  <aside class="preview">
+    <div class="stage" id="stage">
+      <canvas id="out" width="600" height="600" aria-label="QR-Code-Vorschau"></canvas>
+      <div class="stage-msg" id="stage-msg" hidden></div>
+    </div>
+    <div class="status">
+      <span class="check-badge" id="readable" hidden></span>
+      <span class="info" id="qr-info"></span>
+    </div>
+    <div class="export">
+      <div class="seg four" id="format">
+        <button type="button" data-v="png">PNG</button>
+        <button type="button" data-v="svg">SVG</button>
+        <button type="button" data-v="jpeg">JPG</button>
+        <button type="button" data-v="webp">WebP</button>
+      </div>
+      <label class="range"><span>Größe <b data-out="size"></b></span><input type="range" data-s="size" min="256" max="4096" step="64"></label>
+      <button class="btn pri" type="button" id="download"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span id="dl-t">Herunterladen</span></button>
+      <div class="row">
+        <button class="btn small grow" type="button" id="copy"><svg class="i" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Kopieren</button>
+        <button class="btn small grow" type="button" id="share" hidden><svg class="i" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/></svg>Teilen</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ================================================================ Scannen -->
+<main class="scan" id="scan" hidden>
+  <div class="cam" id="cam">
+    <video id="video" playsinline muted></video>
+    <div class="cam-frame" aria-hidden="true"></div>
+    <div class="cam-idle" id="cam-idle">
+      <div class="big-ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7 12h10"/></svg></div>
+      <p>Halte einen QR-Code vor die Kamera – oder öffne ein Bild davon (auch Screenshot, Strg+V).</p>
+      <div class="row center">
+        <button class="btn pri" type="button" id="cam-start"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Kamera starten</button>
+        <label class="btn"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m20 15-4-4-9 9"/></svg>Bild öffnen<input type="file" id="scan-file" accept="image/*" hidden></label>
+      </div>
+      <small class="cam-err" id="cam-err"></small>
+    </div>
+    <div class="cam-bar" id="cam-bar" hidden>
+      <button class="btn small" type="button" id="cam-flip" hidden>Kamera wechseln</button>
+      <button class="btn small" type="button" id="cam-stop">Stopp</button>
+    </div>
+  </div>
+  <div class="results">
+    <div class="list-head"><h2>Gelesen</h2><button class="link-btn" type="button" id="scan-clear" hidden>Liste leeren</button></div>
+    <p class="empty" id="scan-empty">Noch nichts gescannt. Die Liste bleibt nur in diesem Browser.</p>
+    <ul class="scans" id="scans"></ul>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="qr.js"></script>
+</body>
+</html>

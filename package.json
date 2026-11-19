@@ -1,0 +1,16 @@
+{
+  "name": "dealline",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dealline von W Software: Deals festhalten, unterschreiben, als Link teilen, als PDF oder Bild speichern (mert.win/deal).",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node tests/dealline.test.js",
+    "screenshots": "node tests/dealline.test.js --shots",
+    "icons": "node tools/icons.js",
+    "serve": "node tests/server.js 8080"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

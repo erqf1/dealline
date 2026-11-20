@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="de" data-acryl="ocean" data-acryl-auto>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d2230">
+<meta name="description" content="Dealline: Deals mit anderen festhalten – worum es geht, wer was macht, Regeln für alle oder einzelne – unterschreiben, als Link teilen und als PDF oder Bild herunterladen.">
+<title>Dealline – mert.win</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<link rel="manifest" href="app.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="deal.css">
+<!-- Alles läuft im Browser: kein Server, keine fremden Skripte. Geteilte Deals stecken komprimiert im Link (#d=…). -->
+<link rel="stylesheet" href="/app-icons/acryl.css">
+<link rel="stylesheet" href="/app-icons/mobile.css">
+</head>
+<body data-view="edit">
+<header class="top">
+  <a class="brand" href="./"><span class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M4 14.5c1.6-4.6 3.3-6.9 4.4-6.1 1.3 1-1.6 6.1-.3 6.7 1.4.6 2.7-4.3 4.2-4 1.3.2.2 3.4 1.6 3.6 1.1.2 2.4-1.9 3.6-2.7"/><path d="M4 19h16"/></svg></span><span class="brand-t">Dealline</span></a>
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="edit" aria-selected="true" data-i="tabEdit">Deal</button>
+    <button type="button" role="tab" data-tab="doc" aria-selected="false" class="doc-tab" data-i="tabDoc">Dokument</button>
+    <button type="button" role="tab" data-tab="list" aria-selected="false" data-i="tabList">Meine Deals</button>
+  </nav>
+  <span class="spacer"></span>
+  <button class="ib lang" type="button" id="lang" data-i-title="langTitle">EN</button>
+  <a class="all" href="/help/" data-i-title="allApps" title="Alle Apps von mert.win"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg></a>
+</header>
+
+<!-- ================================================================ Deal bearbeiten -->
+<main class="make" id="make">
+  <div class="editor">
+    <section class="box recv" id="recv" hidden>
+      <h2 data-i="recvTitle">Deal über einen Link geöffnet</h2>
+      <p id="recv-text"></p>
+      <button class="btn small" type="button" id="to-sign" data-i="toSign">Zum Unterschreiben</button>
+    </section>
+
+    <details class="box" id="tpl-box">
+      <summary><h2 data-i="tpl">Vorlagen</h2></summary>
+      <p class="hint" data-i="tplHint"></p>
+      <div class="chips" id="tpls"></div>
+    </details>
+
+    <section class="box">
+      <h2 data-i="secDeal">Deal</h2>
+      <label class="field"><span data-i="fTitle">Titel</span><input type="text" data-f="title" maxlength="200" data-i-ph="phTitle"></label>
+      <label class="field"><span data-i="fAbout">Worum es geht</span><textarea data-f="about" rows="3" maxlength="5000" data-i-ph="phAbout"></textarea></label>
+      <div class="grid2">
+        <label class="field"><span data-i="fDate">Datum</span><input type="date" data-f="date"></label>
+        <label class="field"><span data-i="fPlace">Ort</span><input type="text" data-f="place" maxlength="120" data-i-ph="optional"></label>
+      </div>
+      <span class="lab" data-i="fTerm">Laufzeit</span>
+      <div class="grid2">
+        <label class="field"><span data-i="fStart">Beginn</span><input type="date" data-f="start"></label>
+        <label class="field"><span data-i="fEnd">Ende</span><input type="date" data-f="end"></label>
+      </div>
+      <label class="field"><span data-i="fStake">Einsatz / Gegenleistung</span><textarea data-f="stake" rows="2" maxlength="2000" data-i-ph="phStake"></textarea></label>
+    </section>
+
+    <section class="box">
+      <div class="box-head"><h2 data-i="secDeadlines">Fristen</h2></div>
+      <ul class="deadlines" id="deadlines"></ul>
+      <button class="btn small" type="button" id="add-deadline"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i="addDeadline">Frist hinzufügen</span></button>
+    </section>
+
+    <section class="box">
+      <h2 data-i="secMembers">Mitglieder</h2>
+      <div class="members" id="members"></div>
+      <button class="btn small" type="button" id="add-member"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i="addMember">Mitglied hinzufügen</span></button>
+    </section>
+
+    <section class="box">
+      <h2 data-i="secRules">Regeln</h2>
+      <p class="empty" id="rules-empty" data-i="noRules">Noch keine Regeln.</p>
+      <div class="rules" id="rules"></div>
+      <button class="btn small" type="button" id="add-rule"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i="addRule">Regel hinzufügen</span></button>
+    </section>
+
+    <details class="box">
+      <summary><h2 data-i="secMore">Erweitert</h2></summary>
+      <span class="lab" data-i="docLang">Sprache des Dokuments</span>
+      <div class="seg two" id="doc-lang">
+        <button type="button" data-v="de">Deutsch</button>
+        <button type="button" data-v="en">English</button>
+      </div>
+      <div class="row wrap">
+        <button class="btn small" type="button" id="dup" data-i="dupDeal">Duplizieren</button>
+        <button class="btn small" type="button" id="clear-sigs" data-i="clearSigs">Alle Unterschriften entfernen</button>
+        <button class="btn small danger" type="button" id="del" data-i="delDeal">Deal löschen</button>
+      </div>
+      <p class="hint" data-i="legal"></p>
+    </details>
+  </div>
+
+  <aside class="preview" id="preview">
+    <div class="doc-head">
+      <span class="info" id="doc-info"></span>
+      <span class="saved" id="saved"></span>
+    </div>
+    <div class="pages" id="pages" aria-live="off"></div>
+
+    <section class="box sign" id="sign-box">
+      <h2 data-i="secSigs">Unterschriften</h2>
+      <ul class="sigs" id="sigs"></ul>
+    </section>
+
+    <div class="export">
+      <div class="row">
+        <button class="btn pri grow" type="button" id="dl-pdf"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span data-i="pdf">PDF</span></button>
+        <button class="btn grow" type="button" id="dl-png"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m20 15-4-4-9 9"/></svg><span data-i="png">Bild (PNG)</span></button>
+      </div>
+      <button class="btn grow" type="button" id="share"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span data-i="share">Link teilen</span></button>
+      <div class="row">
+        <button class="btn small grow" type="button" id="dl-json" data-i="json">Als Datei (.json)</button>
+        <button class="btn small grow" type="button" id="print" data-i="print">Drucken</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ================================================================ Meine Deals -->
+<main class="list" id="list" hidden>
+  <div class="list-head">
+    <h2 data-i="listTitle">Meine Deals</h2>
+    <div class="row wrap">
+      <button class="btn pri small" type="button" id="new-deal"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i="newDeal">Neuer Deal</span></button>
+      <label class="btn small"><span data-i="openFile">Datei öffnen</span><input type="file" id="open-file" accept=".json,application/json" multiple hidden></label>
+      <button class="btn small" type="button" id="export-all" data-i="exportAll">Alle als Datei</button>
+    </div>
+  </div>
+  <p class="empty" id="list-empty" data-i="listEmpty">Noch keine Deals gespeichert.</p>
+  <ul class="deals" id="deals"></ul>
+  <p class="hint" data-i="listNote"></p>
+</main>
+
+<!-- ================================================================ Dialoge -->
+<dialog class="dlg" id="sign-dlg">
+  <form method="dialog">
+    <h2 id="sign-title"></h2>
+    <div class="seg two" id="sign-mode">
+      <button type="button" data-v="draw" data-i="draw">Zeichnen</button>
+      <button type="button" data-v="type" data-i="type">Tippen</button>
+    </div>
+    <div class="pad-wrap" id="pad-wrap">
+      <canvas id="pad" width="600" height="200" aria-label="Unterschrift"></canvas>
+      <span class="pad-line" aria-hidden="true"></span>
+      <span class="pad-hint" id="pad-hint" data-i="padHint"></span>
+      <button class="link-btn pad-clear" type="button" id="pad-clear" data-i="clear">Löschen</button>
+    </div>
+    <div class="type-wrap" id="type-wrap" hidden>
+      <label class="field"><span data-i="typeLbl">Name zum Unterschreiben</span><input type="text" id="sig-text" maxlength="60" autocomplete="name"></label>
+      <div class="typed" id="typed"></div>
+    </div>
+    <p class="hint" id="sign-note"></p>
+    <div class="row end">
+      <button class="btn" type="button" value="cancel" id="sign-cancel" data-i="cancel">Abbrechen</button>
+      <button class="btn pri" type="button" id="sign-ok" data-i="sign">Unterschreiben</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dlg" id="share-dlg">
+  <form method="dialog">
+    <h2 data-i="shareTitle">Deal als Link</h2>
+    <p class="hint" data-i="shareText"></p>
+    <textarea id="share-link" rows="4" readonly></textarea>
+    <p class="hint warn" id="share-warn" hidden></p>
+    <div class="row end">
+      <button class="btn" type="button" id="share-close" data-i="close">Schließen</button>
+      <button class="btn" type="button" id="share-sys" hidden data-i="shareSys">Teilen …</button>
+      <button class="btn pri" type="button" id="share-copy" data-i="copy">Kopieren</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dlg small" id="ask-dlg">
+  <form method="dialog">
+    <p id="ask-text"></p>
+    <div class="row end">
+      <button class="btn" value="no" data-i="no">Nein</button>
+      <button class="btn pri" value="yes" id="ask-yes" data-i="yes">Ja</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="print-pages" id="print-pages" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status"></div>
+<script src="deal.js"></script>
+</body>
+</html>
